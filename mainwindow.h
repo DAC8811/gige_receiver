@@ -7,6 +7,7 @@
 #include <qformlayout.h>
 #include <QRadioButton>
 #include "NetworkPage.h"
+#include "DiscoveryPage.h"
 #include <QWizard>
 
 QT_BEGIN_NAMESPACE

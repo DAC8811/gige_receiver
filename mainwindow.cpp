@@ -18,8 +18,12 @@ MainWindow::~MainWindow()
 void MainWindow::on_start_clicked()
 {
     QWizard wizard;
-    QNetworkAddressEntry* controller=new QNetworkAddressEntry;
+    GvcpDiscoverer* discoverer = new GvcpDiscoverer;
+    QNetworkAddressEntry* controller = new QNetworkAddressEntry;
+    DISCOVERY_ACK* transmitter = new DISCOVERY_ACK;
+    DISCOVERY_ACK* receiver;
     wizard.setWindowTitle(trUtf8("配置GiGE Vision摄像机"));
     wizard.addPage(new NetworkPage(controller));
+    wizard.addPage(new DiscoveryPage(discoverer,controller,transmitter));
     wizard.exec();
 }
