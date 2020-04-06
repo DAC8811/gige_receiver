@@ -7,7 +7,7 @@
 #include "gvcp/discoveryhelper.h"
 #include "gvcp/bootstrapregisters.h"
 
-class DiscoveryPage : public public QWizardPage
+class DiscoveryPage : public QWizardPage
 {
 public:
     explicit DiscoveryPage(QWidget *parent=Q_NULLPTR);
