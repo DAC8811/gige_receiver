@@ -101,8 +101,6 @@ void DiscoveryPage::initializePage()
 
 bool DiscoveryPage::validatePage()
 {
-
-
     this->discoverID = -1;
     return (this->devicesList->count() > 0);
 }

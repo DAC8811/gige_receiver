@@ -25,6 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     DiscoveryPage.cpp \
+    ForceIPPage.cpp \
     NetworkPage.cpp \
     defaultbackend/defaultbackend.cpp \
     gvcp/bootstrapregisters.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
 
 HEADERS += \
     DiscoveryPage.h \
+    ForceIPPage.h \
     NetworkPage.h \
     defaultbackend/defaultbackend.h \
     defaultbackend/defaultbackend_p.h \

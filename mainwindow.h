@@ -8,6 +8,7 @@
 #include <QRadioButton>
 #include "NetworkPage.h"
 #include "DiscoveryPage.h"
+#include "ForceIPPage.h"
 #include <QWizard>
 
 QT_BEGIN_NAMESPACE
@@ -28,4 +29,6 @@ private slots:
 private:
     Ui::MainWindow *ui;
 };
+
+
 #endif // MAINWINDOW_H

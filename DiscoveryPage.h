@@ -20,9 +20,9 @@ public:
     ~DiscoveryPage();
     static QString ackTohtml(const DISCOVERY_ACK &ack);
 
-     QNetworkAddressEntry* controller;
-     GvcpDiscoverer* discoverer;
-     DISCOVERY_ACK* transmitter;
+    QNetworkAddressEntry* controller;
+    GvcpDiscoverer* discoverer;
+    DISCOVERY_ACK* transmitter;
 
 private slots:
     void discover();
