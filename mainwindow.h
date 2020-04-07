@@ -9,6 +9,7 @@
 #include "NetworkPage.h"
 #include "DiscoveryPage.h"
 #include "ForceIPPage.h"
+#include "GvspPage.h"
 #include <QWizard>
 
 QT_BEGIN_NAMESPACE
