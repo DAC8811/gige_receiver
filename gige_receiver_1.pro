@@ -24,11 +24,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    CameraSession.cpp \
     DiscoveryPage.cpp \
     ForceIPPage.cpp \
     GvspPage.cpp \
     NetworkPage.cpp \
     defaultbackend/defaultbackend.cpp \
+    gev/geviport.cpp \
+    gev/gevmonitor.cpp \
     gvcp/bootstrapregisters.cpp \
     gvcp/broadcastudpsocket.cpp \
     gvcp/discoveryhelper.cpp \
@@ -50,12 +53,18 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    CameraSession.h \
     DiscoveryPage.h \
     ForceIPPage.h \
     GvspPage.h \
     NetworkPage.h \
     defaultbackend/defaultbackend.h \
     defaultbackend/defaultbackend_p.h \
+    genicam/iport.h \
+    gev/geviport.h \
+    gev/geviport_p.h \
+    gev/gevmonitor.h \
+    gev/gevmonitor_p.h \
     gvcp/bootstrapregisters.h \
     gvcp/bootstrapregisters_p.h \
     gvcp/broadcastudpsocket.h \

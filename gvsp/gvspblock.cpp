@@ -33,11 +33,11 @@ GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat)
 
 void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
 {
-    // il n'existe pas de segment 0
+    // 没有段0
     if (Q_UNLIKELY(segNum == 0)) {
         qWarning("Buffer index == 0");
     }
-    //  5 premier segment, on s'en sert pour fixer les données segment
+    //  5个第一个细分，我们用它来修复细分数据
     else if (segNum<=5 && segmentSize==0)
     {
         segmentSize = mem.size;
@@ -45,11 +45,11 @@ void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
         lastSegmentSize = datas.size%segmentSize;
         std::memcpy(datas.p + ((segNum-1) * segmentSize), mem.data, segmentSize);
     }
-    // segment plein
+    // 实心段
     else if (segNum < lastIndex && Q_LIKELY(mem.size == segmentSize)) {
         std::memcpy(datas.p + ((segNum-1) * segmentSize), mem.data, segmentSize);
     }
-    // cas du dernier segment
+    // 最后一段的情况
     else if (segNum == lastIndex && Q_LIKELY(mem.size <= segmentSize)) {
         // le device peut faire du padding, la dernière taille peut
         // être de la taille normale

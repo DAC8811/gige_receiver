@@ -27,5 +27,7 @@ void MainWindow::on_start_clicked()
     wizard.addPage(new DiscoveryPage(discoverer,controller,transmitter));
     wizard.addPage(new ForceIPPage(discoverer,controller,transmitter));
     wizard.addPage(new GvspPage(discoverer,controller,transmitter,receiver));
-    wizard.exec();
+    if( wizard.exec() == QDialog::Accepted);
+
+
 }
