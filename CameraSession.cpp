@@ -1,4 +1,6 @@
 #include "CameraSession.h"
+#include "gvsp/GvspClient.h"
+#include "gvsp/gvspreceiver.h"
 
 
 
@@ -21,6 +23,5 @@ void CameraSession::initSession(const QHostAddress &controller, const QHostAddre
     QByteArray firstURL = monitor.getFirstUrl();
     QString fileName = GevMonitor::filenameFromFirstURL(firstURL);
     QByteArray xml = monitor.getXml(monitor.getFirstUrl());
-
-//    this->gvsp = new GvspReceiver(QSharedPointer<GvspClient>(new GvspClient),this);
+    this->gvsp = new GvspReceiver(new GvspClient);
 }

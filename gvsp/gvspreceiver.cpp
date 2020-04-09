@@ -70,7 +70,7 @@ struct BlockDesc {
 };
 
 
-GvspReceiverPrivate::GvspReceiverPrivate(QSharedPointer<GvspClient> client)
+GvspReceiverPrivate::GvspReceiverPrivate(GvspClient* client)
     : client(client),
       run(true),
       receiverPort(0),
@@ -252,7 +252,7 @@ int GvspReceiverPrivate::nicIndexFromAddress(const QHostAddress &address)
 }
 
 
-GvspReceiver::GvspReceiver(QSharedPointer<GvspClient> client, QObject *parent)
+GvspReceiver::GvspReceiver(GvspClient* client, QObject *parent)
     : QThread(parent),
       d(new GvspReceiverPrivate(client))
 {}

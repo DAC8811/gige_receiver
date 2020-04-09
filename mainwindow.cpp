@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QDebug>
+#include "CameraSession.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -27,7 +29,11 @@ void MainWindow::on_start_clicked()
     wizard.addPage(new DiscoveryPage(discoverer,controller,transmitter));
     wizard.addPage(new ForceIPPage(discoverer,controller,transmitter));
     wizard.addPage(new GvspPage(discoverer,controller,transmitter,receiver));
-    if( wizard.exec() == QDialog::Accepted);
+    if( wizard.exec() == QDialog::Accepted)
+    {
+         CameraSession *session = new CameraSession;
+         session->initSession(controller->ip(), QHostAddress(DiscoveryAckHelper::currentIP(*(transmitter))));
+    }
 
 
 }

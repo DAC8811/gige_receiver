@@ -22,7 +22,7 @@
 #define GVSP_H
 
 #include <QtGlobal>
-
+#include "GvspClient.h"
 //===================================================
 // PIXEL FORMATS
 //===================================================
@@ -139,13 +139,14 @@ public:
     GvspImage(uint w=0, uint h=0, quint32 p=0, size_t s=0):geometry(w,h,p),datas(0,s),timestamp(0),isBayer(false){}
 };
 
-class GvspClient {
-public:
-    virtual ~GvspClient(){}
-    virtual void allocate(GvspImage &image) = 0;
-    virtual void push(GvspImage &image) = 0;
-    virtual void trash(GvspImage &image) const = 0;
-};
+//class GvspClient {
+//public:
+//    virtual ~GvspClient(){}
+//    virtual void allocate(GvspImage &image) = 0;
+//    virtual void push(GvspImage &image) = 0;
+//    virtual void trash(GvspImage &image) const = 0;
+//};
+
 
 
 

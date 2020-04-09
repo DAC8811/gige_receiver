@@ -35,7 +35,8 @@ class GvspReceiver : public QThread
     //        Q_OBJECT
 
 public:
-    explicit GvspReceiver(QSharedPointer<GvspClient> client, QObject *parent = 0);
+    //explicit GvspReceiver(QSharedPointer<GvspClient> client, QObject *parent = 0);
+    explicit GvspReceiver(GvspClient* client, QObject *parent = 0);
     ~GvspReceiver();
 
     quint16 getFreePort(const QHostAddress &address);

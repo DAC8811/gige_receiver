@@ -33,8 +33,8 @@ struct tpacket_req3;
 class GvspReceiverPrivate
 {
 public:
-    GvspReceiverPrivate(QSharedPointer<GvspClient> client);
-    QSharedPointer<GvspClient> client;  // le consommateur de paquets GVSP GVSP数据包接受端
+    GvspReceiverPrivate(GvspClient* client);
+    GvspClient* client;  // le consommateur de paquets GVSP GVSP数据包接受端
     volatile bool run;                  // contrôle la sortie de boucle 控制回路输出
 
     QHostAddress receiver;
