@@ -98,33 +98,57 @@ struct GVSP_DATATRAILER_IMAGE {
     uchar sizeY[4];
 };
 
+//这里原代码写的真是不知所云，既不符合all-in也不符合标准模式
+//union GVSP_DATA {
+//    GVSP_HEADER header;
+//    GVSP_DATALEADER leader;
+//    GVSP_DATALEADER_IMAGE leaderImage;
+//    GVSP_PAYLOAD_IMAGE payload;
+//    GVSP_DATATRAILER trailer;
+//    GVSP_DATATRAILER_IMAGE trailerImage;
+//};
 
-union GVSP_DATA {
-    GVSP_HEADER header;
-    GVSP_DATALEADER leader;
-    GVSP_DATALEADER_IMAGE leaderImage;
-    GVSP_PAYLOAD_IMAGE payload;
-    GVSP_DATATRAILER trailer;
-    GVSP_DATATRAILER_IMAGE trailerImage;
-};
+//#define GVSP(t) reinterpret_cast<const GVSP_DATA *const>(t)
 
-#define GVSP(t) reinterpret_cast<const GVSP_DATA *const>(t)
-
+//class GvspPacket : private ConstMemoryBlock
+//{
+//public:
+//    explicit GvspPacket(const quint8 *const data, size_t size);
+//    int status() const { return qFromBigEndian<quint16>(GVSP(data)->header.status); }
+//    quint16 blockID() const { return qFromBigEndian<quint16>(GVSP(data)->header.blockID); }
+//    uint packetID() const { return 0x00FFFFFF & qFromBigEndian<quint32>(GVSP(data)->header.packetFormat); }
+//    int packetFormat() const { return GVSP(data)->header.packetFormat[0]; }
+//    int payloadType() const { return qFromBigEndian<quint16>(GVSP(data)->leader.payloadType); }
+//    quint64 timestamp() const { return qFromBigEndian<quint64>(GVSP(data)->leader.timestampHighPart); }
+//    uint pixelFormat() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.pixelFormat); }
+//    uint width() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.sizeX); }
+//    uint height() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.sizeY); }
+//    quint16 paddingX() const { return qFromBigEndian<quint16>(GVSP(data)->leaderImage.paddingX); }
+//    quint16 paddingY() const { return qFromBigEndian<quint16>(GVSP(data)->leaderImage.paddingY); }
+//    const ConstMemoryBlock imagePayload;
+//};
+#define GVSP(t) reinterpret_cast<const GVSP_HEADER *const>(t)
+#define GVSP_L(t) reinterpret_cast<const GVSP_DATALEADER_IMAGE *const>(t)
+#define GVSP_T(t) reinterpret_cast<const GVSP_DATATRAILER_IMAGE *const>(t)
+#define GVSP_P(t) reinterpret_cast<const GVSP_PAYLOAD_IMAGE *const>(t)
 class GvspPacket : private ConstMemoryBlock
 {
 public:
+
+    quint16 packetformat;
+
     explicit GvspPacket(const quint8 *const data, size_t size);
-    int status() const { return qFromBigEndian<quint16>(GVSP(data)->header.status); }
-    quint16 blockID() const { return qFromBigEndian<quint16>(GVSP(data)->header.blockID); }
-    uint packetID() const { return 0x00FFFFFF & qFromBigEndian<quint32>(GVSP(data)->header.packetFormat); }
-    int packetFormat() const { return GVSP(data)->header.packetFormat[0]; }
-    int payloadType() const { return qFromBigEndian<quint16>(GVSP(data)->leader.payloadType); }
-    quint64 timestamp() const { return qFromBigEndian<quint64>(GVSP(data)->leader.timestampHighPart); }
-    uint pixelFormat() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.pixelFormat); }
-    uint width() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.sizeX); }
-    uint height() const { return qFromBigEndian<quint32>(GVSP(data)->leaderImage.sizeY); }
-    quint16 paddingX() const { return qFromBigEndian<quint16>(GVSP(data)->leaderImage.paddingX); }
-    quint16 paddingY() const { return qFromBigEndian<quint16>(GVSP(data)->leaderImage.paddingY); }
+    int status() const { return qFromBigEndian<quint16>(GVSP(data)->status); }
+    quint16 blockID() const { return qFromBigEndian<quint16>(GVSP(data)->blockID); }
+    uint packetID() const { return 0x00FFFFFF & qFromBigEndian<quint32>(GVSP(data)->packetFormat); }
+    int packetFormat() const { return GVSP(data)->packetFormat[0]; }
+    int payloadType() const;
+    quint64 timestamp() const;
+    uint pixelFormat() const;
+    uint width() const;
+    uint height() const;
+    quint16 paddingX() const;
+    quint16 paddingY() const;
     const ConstMemoryBlock imagePayload;
 };
 

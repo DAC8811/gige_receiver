@@ -77,18 +77,6 @@ GvspReceiverPrivate::GvspReceiverPrivate(GvspClient* client)
       block(NULL)
 {}
 
-tpacket_req3 GvspReceiverPrivate::createRing()
-{
-    tpacket_req3 req = {0};
-    req.tp_block_size = getpagesize() << 2;        // 16384 octets, soit 1 trame en MTU jumbo frame 16,384字节，即MTU巨型帧中的1帧
-    req.tp_frame_size = TPACKET_ALIGNMENT << 6;    // 1024 octets, le plus petit packet GVSP étant 576 1024字节，最小的GVSP数据包为576
-    req.tp_block_nr = 512;                         //
-    req.tp_frame_nr = (req.tp_block_size * req.tp_block_nr) / req.tp_frame_size;
-    req.tp_sizeof_priv = 0;
-    req.tp_retire_blk_tov = 200;
-    //ring.req.tp_feature_req_word = TP_FT_REQ_FILL_RXHASH;
-    return req;
-}
 
 int GvspReceiverPrivate::setupSocket(const tpacket_req3 &req)
 {
@@ -115,19 +103,6 @@ int GvspReceiverPrivate::setupSocket(const tpacket_req3 &req)
     }
 
     return sd;
-}
-
-quint8 *GvspReceiverPrivate::mapRing(int sd, const tpacket_req3 &req)
-{
-    // mapping du ring
-    quint8 *map = NULL;
-    if ((map = static_cast<quint8 *>(mmap(NULL, req.tp_block_size * req.tp_block_nr, PROT_READ | PROT_WRITE,
-                                          MAP_SHARED, sd, 0))) == MAP_FAILED )
-    {
-        const int errn = errno;
-        qWarning("Erreur mapping %s", strerror(errn));
-    }
-    return map;
 }
 
 void GvspReceiverPrivate::setUdpPortFilter(int sd, quint16 port)
@@ -285,14 +260,14 @@ void GvspReceiver::listen(const QHostAddress &receiverAddress, quint16 receiverP
 
 void GvspReceiver::run()
 {
-    // descripteur du socket UDP UDP套接字描述符
+    //UDP套接字描述符
     int sd;
     if ( (sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0 ) {
         qWarning("%s",qPrintable(trUtf8("Echec création socket GVSP")));
         return;
     }
 
-    // bind du socket UDP UDP套接字绑定
+    //UDP套接字绑定
     sockaddr_in localAddress = {0};
     localAddress.sin_family = AF_INET;
     localAddress.sin_port = htons(d->receiverPort);
@@ -302,15 +277,15 @@ void GvspReceiver::run()
         return;
     }
 
-    // on récupère le numéro de port affecté 我们得到分配的端口号
+    //我们得到分配的端口号
     struct sockaddr_in bindAddress; 
     socklen_t bindAddressSize = sizeof(struct sockaddr_in);
     getsockname(sd, (struct sockaddr *)&bindAddress, &bindAddressSize);
 
-    // obteint l'ordonnancement temps réel 获得实时调度
+    //获得实时调度
     d->setRealtime();
 
-    // si on a la capacity on démarre un socket mmap ring buffer 如果有能力，我们启动一个mmap环形缓冲区插槽
+    // 如果有能力，我们启动一个mmap环形缓冲区插槽
 //    if (capng_have_capability(CAPNG_EFFECTIVE, CAP_NET_RAW)) {
 //        d->ringStack(d->receiverPort);
 //    }
@@ -325,27 +300,27 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
 {
     qDebug("Using user mode stack");
 
-    // préparation du polling sur le descripteur de socket  在套接字描述符上准备轮询
+    //在套接字描述符上准备轮询
     pollfd pfd = {0};
     pfd.fd = socketDescriptor;
     pfd.events = POLLIN;
 
-    // variables globales à la boucle   循环中的全局变量
+    // 循环中的全局变量
     int pollResult = 0;
 
     const int VLEN = 8;
-    // allocation et initialisation réelle des tampons 缓冲区的分配和初始化
+    // 缓冲区的分配和初始化
     uint8_t bufs[VLEN][GVSP_BUFFER_SIZE] = {{0}};
-    // tableau de structures à passer à recvmmsg 传递给recvmmsg的结构数组
+    //传递给recvmmsg的结构数组
     mmsghdr msgs[VLEN] = {0};
-    // pour le mappage des tampons 用于缓冲区映射
+    //用于缓冲区映射
     iovec iovecs[VLEN] = {0};
-    // mappage de la mémoire réelle 实内存映射
+    //实内存映射
     for (int i = 0; i < VLEN; i++) {
-        iovecs[i].iov_base         = bufs[i];           // l'adresse du nième tampon 第n个图章的地址
-        iovecs[i].iov_len          = GVSP_BUFFER_SIZE;  // sa taille 大小
-        msgs[i].msg_hdr.msg_iov    = &iovecs[i];        // l'adresse du iovec correspondant 相应的iovec的地址
-        msgs[i].msg_hdr.msg_iovlen = 1;                 // 1 seul élément dans le vecteur 向量中有1个元素
+        iovecs[i].iov_base         = bufs[i];           // 第n个缓冲区的地址
+        iovecs[i].iov_len          = GVSP_BUFFER_SIZE;  // 大小
+        msgs[i].msg_hdr.msg_iov    = &iovecs[i];        //相应的iovec的地址
+        msgs[i].msg_hdr.msg_iovlen = 1;                 //向量中有1个元素
     }
 
     timespec timeout = {0};
@@ -353,12 +328,13 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     timeout.tv_nsec = 500000000ll;
 
     while (run) {
-        // attend un évènement à lire 等待事件阅读
+        // 等待事件阅读
         if ( (pollResult = poll(&pfd, 1, 200)) > 0 ) {
-            const int retval = recvmmsg(socketDescriptor, msgs, VLEN, 0, &timeout);
+            const int retval = recvmmsg(socketDescriptor, msgs, VLEN, 0, &timeout);//retval对应的是接收的信息数，即报文数
             if (retval > 0) {
                 for (int i=0; i < retval; ++i) {
                     GvspPacket gvsp(reinterpret_cast<const quint8 *>(iovecs[i].iov_base), msgs[i].msg_len);
+                    qWarning("status:%d blockID:%d packetID:%d packetFormat:%d payloadType:%d timestamp:%d pixelformat:%d width:%d height:%d",gvsp.status(),gvsp.blockID(),gvsp.packetID(),gvsp.packetFormat(),gvsp.payloadType(),gvsp.timestamp(),gvsp.pixelFormat(),gvsp.width(),gvsp.height());
                     doGvspPacket(gvsp);
                 }
             }
@@ -385,110 +361,6 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     }
 }
 
-
-void GvspReceiverPrivate::ringStack(quint16 port)
-{
-    qDebug("Using ring buffer mode stack");
-
-    // dimensionne le ring  调整环的尺寸
-    tpacket_req3 req = createRing();
-
-    // creation du socket
-    int sd = setupSocket(req);
-
-    // mapping du ring
-    quint8 *map = mapRing(sd, req);
-    if (map == MAP_FAILED) {
-        return;
-    }
-
-    setUdpPortFilter(sd, port);
-
-    const int nicIndex = nicIndexFromAddress(QHostAddress(receiver));
-
-    if (!bindPacketSocket(sd, nicIndex)) {
-        qWarning("Failed to bind packet socket");
-        return;
-    }
-
-    // allocation des descripteurs de block
-    iovec vecs[req.tp_block_nr];
-    iovec zero = {0};
-    std::fill(vecs, vecs + req.tp_block_nr, zero);
-    for (uint i=0; i<req.tp_block_nr;++i) {
-        vecs[i].iov_base = map + (i * req.tp_block_size);
-        vecs[i].iov_len = req.tp_block_size;
-    }
-
-    // préparation du polling sur le descripteur de socket
-    pollfd pfd = {0};
-    pfd.fd = sd;
-    pfd.events = POLLIN;
-
-    // on commence par le premier block
-    unsigned int currentBlockNum = 0;
-
-    while (run) {
-        // on caste le bloc
-        BlockDesc *bd = reinterpret_cast<BlockDesc *>(vecs[currentBlockNum].iov_base);
-
-        // sil le bloc est indisponible
-        if ((bd->header_v1.block_status & TP_STATUS_USER) == 0) {
-            // on attends un évènement sur le socket packet
-            poll(&pfd, 1, 100);
-            // le poll est déclenché on recommence la procédure
-            continue;
-        }
-        doBlock(bd);
-        bd->header_v1.block_status = TP_STATUS_KERNEL;
-        //__sync_synchronize();
-
-        currentBlockNum = (currentBlockNum + 1) % req.tp_block_nr;
-    }
-
-    munmap(map, req.tp_block_size * req.tp_block_nr);
-    close(sd);
-}
-
-
-
-
-
-
-
-
-
-
-
-
-void GvspReceiverPrivate::doBlock(const BlockDesc *block)
-{
-    // le premier header de type 3 est à l'offset indiqué dans le header tpacket_hdr_v1
-    //tpacket3_hdr *header = reinterpret_cast<tpacket3_hdr*>((uint8_t*)block + block->header_v1.offset_to_first_pkt);
-    const tpacket3_hdr *header = reinterpret_cast<const tpacket3_hdr*>(reinterpret_cast<const quint8 *>(block) + block->header_v1.offset_to_first_pkt);
-
-    // on parcourt toutes les grames décrites dans le bloc
-    for (__u32 i=0; i<block->header_v1.num_pkts; ++i) {
-        // on a besoin de l'ente IP pour connaitre la taille du paquet
-        const iphdr *ip = reinterpret_cast<const iphdr *>(reinterpret_cast<const uint8_t *>(header) + header->tp_mac + ETH_HLEN); // on saute l'entete ethernet
-        // quelques vérifivations pour le debug
-        Q_ASSERT(ip->protocol == IPPROTO_UDP);
-        // GiGE vision interdit les options d'entetes IP, la taille de l'entête doit être de 5 (32 bits)
-        Q_ASSERT(ip->ihl == 5);
-
-
-        GvspPacket gvsp(reinterpret_cast<const quint8 *>(ip) + IP_HEADER_SIZE + UDP_HEADER_SIZE,
-                        ntohs(ip->tot_len) - IP_HEADER_SIZE - UDP_HEADER_SIZE);
-
-        doGvspPacket(gvsp);
-
-
-        // l'offset de l'header suivant est indiqué dans l'header courant
-        header = reinterpret_cast<const tpacket3_hdr*>(reinterpret_cast<const quint8 *>(header) + header->tp_next_offset);
-        //        __sync_synchronize();
-    }
-}
-
 void GvspReceiverPrivate::doGvspPacket(const GvspPacket &gvsp)
 {
     const int status = gvsp.status();
@@ -499,6 +371,7 @@ void GvspReceiverPrivate::doGvspPacket(const GvspPacket &gvsp)
     if  (Q_LIKELY(status == STATUS::SUCCESS)) {
         if (packetFormat == PACKET_FORMAT::DATA_PAYLOAD) {
             if (block->num == blockID) {
+                qWarning("packetID%d",packetID);
                 block->insert(packetID, gvsp.imagePayload);
             }
         }

@@ -43,7 +43,7 @@ public:
 
     GvspBlock *block;
 
-    static tpacket_req3 createRing();
+
     static int setupSocket(const tpacket_req3 &req);
     static quint8 *mapRing(int sd, const tpacket_req3 &req);
     static void setUdpPortFilter(int sd, quint16 port);
@@ -52,9 +52,9 @@ public:
     static int nicIndexFromAddress(const QHostAddress &address);
 
     void userStack(int socketDescriptor);
-    void ringStack(quint16 port);
+
     void doGvspPacket(const GvspPacket &gvsp);
-    void doBlock(const BlockDesc *block);
+
 
 
 }; // GvspReceiverPrivate

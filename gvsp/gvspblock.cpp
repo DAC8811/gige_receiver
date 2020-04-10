@@ -56,7 +56,7 @@ void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
         std::memcpy(datas.p + ((segNum-1) * segmentSize), mem.data, lastSegmentSize);
     }
     else {
-        qWarning("GvspBlock %d insert error segNum:%u", num, segNum);
+        qWarning("GvspBlock %d insert error segNum:%u lastIndex = %d segmentSize=%d mem.size=%d", num, segNum,lastIndex,segmentSize,mem.size);
     }
 }
 
