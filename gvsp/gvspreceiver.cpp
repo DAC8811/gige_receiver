@@ -284,15 +284,7 @@ void GvspReceiver::run()
 
     //获得实时调度
     d->setRealtime();
-
-    // 如果有能力，我们启动一个mmap环形缓冲区插槽
-//    if (capng_have_capability(CAPNG_EFFECTIVE, CAP_NET_RAW)) {
-//        d->ringStack(d->receiverPort);
-//    }
-//    else {
-        d->userStack(sd);
-//    }
-
+    d->userStack(sd);
     close(sd);
 }
 
@@ -349,7 +341,6 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
             if (pollResult < 0) {
                 const int errn = errno;
                 if (errn == EINTR) {
-                    // surement gprof
                 }
                 else {
                     qWarning("poll() error %d %s", errn, strerror(errn));
