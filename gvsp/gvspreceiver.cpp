@@ -378,7 +378,7 @@ void GvspReceiverPrivate::doGvspPacket(const GvspPacket &gvsp)
             }
 
             //d->block = new GvspBlock(blockID, d->payloadSize, gvsp.width(), gvsp.height(), gvsp.pixelFormat(), d->segmentSize);
-            block = new GvspBlock(blockID, gvsp.width(), gvsp.height(), gvsp.pixelFormat());
+            block = new GvspBlock(blockID, gvsp.width(), gvsp.height(), gvsp.pixelFormat(),gvsp.type());
             block->timestamp = static_cast<qint64>(start.tv_sec) * Q_INT64_C(1000000000) + start.tv_nsec;
             client->allocate(*block);
 

@@ -23,13 +23,14 @@
 #include <sys/uio.h>
 #include <cstring>
 
-GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat)
+GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type)
     : //GvspImage(width, height, pixelFormat, (width * height * GVSP_PIX_PIXEL_SIZE(pixelFormat)) / 8),
-      GvspImage(width, height, pixelFormat, width * height * pixelFormat),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的字节数
+      GvspImage(width, height, pixelFormat, width * height * pixelFormat,type),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的字节数
       num(num),
       segmentSize(0),
       lastIndex(1),
       lastSegmentSize(0)
+
 {}
 
 void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)

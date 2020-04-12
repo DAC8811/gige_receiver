@@ -150,6 +150,7 @@ public:
     uint height() const;
     quint16 paddingX() const;
     quint16 paddingY() const;
+    quint32 type() const;
     const ConstMemoryBlock imagePayload;
 };
 

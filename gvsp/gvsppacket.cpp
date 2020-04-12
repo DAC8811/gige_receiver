@@ -99,3 +99,14 @@ quint16 GvspPacket::paddingY() const
     return 0;
 }
 
+quint32 GvspPacket::type() const
+{
+    switch(this->packetformat)
+    {
+    case PACKET_FORMAT::DATA_LEADER:return qFromBigEndian<quint32>(GVSP_L(data)->offsetX);
+    case PACKET_FORMAT::DATA_PAYLOAD:qWarning("type payload have no part type");break;
+    case PACKET_FORMAT::DATA_TRAILER:qWarning("type trailer have no part type");break;
+    }
+    return 0;
+}
+

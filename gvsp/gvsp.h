@@ -136,7 +136,8 @@ public:
     MemoryBlock datas;
     quint64 timestamp;
     bool isBayer;
-    GvspImage(uint w=0, uint h=0, quint32 p=0, size_t s=0):geometry(w,h,p),datas(0,s),timestamp(0),isBayer(false){}
+    int type;
+    GvspImage(uint w=0, uint h=0, quint32 p=0, size_t s=0,int type=0):geometry(w,h,p),datas(0,s),timestamp(0),isBayer(false),type(type){}
 };
 
 //class GvspClient {

@@ -28,7 +28,7 @@ class ConstMemoryBlock;
 class GvspBlock : public GvspImage
 {
 public:
-    explicit GvspBlock(uint num, uint width, uint height, quint32 pixelFormat);
+    explicit GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type);
     void insert(quint16 segNum, const ConstMemoryBlock &mem);
 
     const uint num;                  //段号
