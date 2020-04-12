@@ -49,6 +49,7 @@
 #include <QNetworkInterface>
 #include <QUdpSocket>
 #include <QDebug>
+#include <QMutex>
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -300,7 +301,7 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     // 循环中的全局变量
     int pollResult = 0;
 
-    const int VLEN = 8;
+    const int VLEN = 5;
     // 缓冲区的分配和初始化
     uint8_t bufs[VLEN][GVSP_BUFFER_SIZE] = {{0}};
     //传递给recvmmsg的结构数组
@@ -322,6 +323,7 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     while (run) {
         // 等待事件阅读
         if ( (pollResult = poll(&pfd, 1, 200)) > 0 ) {
+            mutex.lock();
             const int retval = recvmmsg(socketDescriptor, msgs, VLEN, 0, &timeout);//retval对应的是接收的信息数，即报文数
             if (retval > 0) {
                 for (int i=0; i < retval; ++i) {
@@ -329,6 +331,7 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
                     qWarning("status:%d blockID:%d packetID:%d packetFormat:%d payloadType:%d timestamp:%d pixelformat:%d width:%d height:%d",gvsp.status(),gvsp.blockID(),gvsp.packetID(),gvsp.packetFormat(),gvsp.payloadType(),gvsp.timestamp(),gvsp.pixelFormat(),gvsp.width(),gvsp.height());
                     doGvspPacket(gvsp);
                 }
+            mutex.unlock();
             }
             else if (retval == -1) {
                 int errn = errno;

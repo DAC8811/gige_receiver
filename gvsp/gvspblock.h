@@ -31,11 +31,11 @@ public:
     explicit GvspBlock(uint num, uint width, uint height, quint32 pixelFormat);
     void insert(quint16 segNum, const ConstMemoryBlock &mem);
 
-    const uint num;                  // le numéro de bloc
+    const uint num;                  //段号
 private:
-    size_t segmentSize;       // la taille d'un segment de données
-    uint lastIndex;            // le dernier index des segments
-    uint lastSegmentSize;      // la taille du dernier segment
+    size_t segmentSize;        // 包长度
+    uint lastIndex;            // 最后一个包索引
+    uint lastSegmentSize;      // 最后一个包的长度
 
 };
 

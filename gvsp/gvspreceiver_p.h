@@ -23,6 +23,7 @@
 
 #include <QHostAddress>
 #include <QSharedPointer>
+#include <QMutex>
 
 class GvspClient;
 class GvspPacket;
@@ -42,6 +43,8 @@ public:
     quint16 receiverPort;
 
     GvspBlock *block;
+
+    QMutex mutex;
 
 
     static int setupSocket(const tpacket_req3 &req);

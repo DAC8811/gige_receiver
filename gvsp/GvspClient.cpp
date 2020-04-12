@@ -1,4 +1,5 @@
 #include "GvspClient.h"
+#include <opencv2/opencv.hpp>
 
 GvspClient::GvspClient()
 {
@@ -12,6 +13,9 @@ void GvspClient::allocate(GvspImage &image)
 }
 void GvspClient::push(GvspImage &image)
 {
+    cv::Mat file(image.geometry.height, image.geometry.width, CV_8UC1, image.datas.p);
+    cv::imwrite("/home/ash-1/qt_pj/data_save/test3.jpg",file);
+    qWarning("ok");
 }
 void GvspClient::trash(GvspImage &image)
 {

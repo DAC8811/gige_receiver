@@ -25,7 +25,7 @@
 
 GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat)
     : //GvspImage(width, height, pixelFormat, (width * height * GVSP_PIX_PIXEL_SIZE(pixelFormat)) / 8),
-      GvspImage(width, height, pixelFormat, width * height * pixelFormat),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的bit
+      GvspImage(width, height, pixelFormat, width * height * pixelFormat),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的字节数
       num(num),
       segmentSize(0),
       lastIndex(1),
@@ -34,11 +34,11 @@ GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat)
 
 void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
 {
-    // 没有段0
+    // 包0应该是leader，所以出现包0是有问题的
     if (Q_UNLIKELY(segNum == 0)) {
         qWarning("Buffer index == 0");
     }
-    //  5个第一个细分，我们用它来修复细分数据
+    //  用前5个包来计算总的包个数以及每个标准包的数据长度
     else if (segNum<=5 && segmentSize==0)
     {
         segmentSize = mem.size;
@@ -46,11 +46,11 @@ void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
         lastSegmentSize = datas.size%segmentSize;
         std::memcpy(datas.p + ((segNum-1) * segmentSize), mem.data, segmentSize);
     }
-    // 实心段
+    // 标准包
     else if (segNum < lastIndex && Q_LIKELY(mem.size == segmentSize)) {
         std::memcpy(datas.p + ((segNum-1) * segmentSize), mem.data, segmentSize);
     }
-    // 最后一段的情况
+    // 最后一个包
     else if (segNum == lastIndex && Q_LIKELY(mem.size <= segmentSize)) {
         // le device peut faire du padding, la dernière taille peut
         // être de la taille normale

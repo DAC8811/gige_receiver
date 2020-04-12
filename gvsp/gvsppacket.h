@@ -24,7 +24,8 @@
 #include "constmemoryblock.h"
 #include <QtEndian>
 
-const size_t GVSP_BUFFER_SIZE = 10000;
+//const size_t GVSP_BUFFER_SIZE = 10000;
+const size_t GVSP_BUFFER_SIZE = 3000;
 const uint IP_HEADER_SIZE = 20;
 const uint UDP_HEADER_SIZE = 8;
 
