@@ -22,14 +22,19 @@
 #include "gvsppacket.h"
 #include <sys/uio.h>
 #include <cstring>
+#include <opencv2/opencv.hpp>
 
 GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type)
     : //GvspImage(width, height, pixelFormat, (width * height * GVSP_PIX_PIXEL_SIZE(pixelFormat)) / 8),
-      GvspImage(width, height, pixelFormat, width * height * pixelFormat,type),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的字节数
+     // GvspImage(width, height, pixelFormat, width * height * pixelFormat,type),//原本这里pixelFormat应该指的是像素格式，这里直接换成opencv格式中的深度，即每个像素占的字节数
       num(num),
       segmentSize(0),
       lastIndex(1),
-      lastSegmentSize(0)
+      lastSegmentSize(0),
+      datas(NULL,width * height * pixelFormat),
+      type(type),
+      width(width),
+      height(height)
 
 {}
 
@@ -60,5 +65,20 @@ void GvspBlock::insert(quint16 segNum, const ConstMemoryBlock &mem)
     else {
         qWarning("GvspBlock %d insert error segNum:%u lastIndex = %d segmentSize=%d mem.size=%d", num, segNum,lastIndex,segmentSize,mem.size);
     }
+}
+
+void GvspBlock::allocate()
+{
+    this->datas.p = new quint8[this->datas.size];
+}
+void GvspBlock::push()
+{
+    cv::Mat file(this->height, this->width, this->type, this->datas.p);
+    cv::imwrite("/home/ash-1/qt_pj/data_save/test3.jpg",file);
+    qWarning("ok");
+}
+void GvspBlock::trash()
+{
+    delete [] this->datas.p;
 }
 

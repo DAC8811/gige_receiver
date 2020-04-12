@@ -132,7 +132,7 @@ struct GVSP_DATATRAILER_IMAGE {
 #define GVSP_L(t) reinterpret_cast<const GVSP_DATALEADER_IMAGE *const>(t)
 #define GVSP_T(t) reinterpret_cast<const GVSP_DATATRAILER_IMAGE *const>(t)
 #define GVSP_P(t) reinterpret_cast<const GVSP_PAYLOAD_IMAGE *const>(t)
-class GvspPacket : private ConstMemoryBlock
+class GvspPacket : private ConstMemoryBlock//这个类用来存储和解析每一个包的数据
 {
 public:
 

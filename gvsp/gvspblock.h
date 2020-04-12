@@ -25,13 +25,24 @@
 
 class ConstMemoryBlock;
 
-class GvspBlock : public GvspImage
+class GvspBlock//这个类用来存储和处理整个数据帧（一般就是一张图片）
+ //       : public GvspImage
 {
 public:
     explicit GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type);
     void insert(quint16 segNum, const ConstMemoryBlock &mem);
 
     const uint num;                  //段号
+
+    quint64 timestamp;
+    MemoryBlock datas;
+    int type;
+    uint height;
+    uint width;
+
+    void allocate();
+    void push();
+    void trash();
 private:
     size_t segmentSize;        // 包长度
     uint lastIndex;            // 最后一个包索引

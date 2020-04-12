@@ -23,13 +23,21 @@
 
 #include <QThread>
 #include <QScopedPointer>
+#include <QHostAddress>
+#include <QSharedPointer>
 
 template <class T>
 class QSharedPointer;
 class GvspClient;
 class QHostAddress;
 
-class GvspReceiverPrivate;
+class GvspClient;
+class GvspPacket;
+class GvspBlock;
+struct BlockDesc;
+struct tpacket_req3;
+
+//class GvspReceiverPrivate;
 class GvspReceiver : public QThread
 {
     //        Q_OBJECT
@@ -45,11 +53,35 @@ public:
 private:
     void run();
 
-protected:
-    const QScopedPointer<GvspReceiverPrivate> d;
+//protected:
+//    const QScopedPointer<GvspReceiverPrivate> d;
 
 private:
     Q_DISABLE_COPY(GvspReceiver)
+
+public:
+    GvspClient* client;  //数据包接收端
+    volatile bool _run;                  //控制回路输出
+
+    QHostAddress receiver;
+    QHostAddress transmitter;
+    quint16 receiverPort;
+
+    GvspBlock *block;
+
+
+
+    static int setupSocket(const tpacket_req3 &req);
+//    static quint8 *mapRing(int sd, const tpacket_req3 &req);
+    static void setUdpPortFilter(int sd, quint16 port);
+    static bool bindPacketSocket(int sd, int nicIndex);
+    static void setRealtime();
+    static int nicIndexFromAddress(const QHostAddress &address);
+
+    void userStack(int socketDescriptor);
+
+    void doGvspPacket(const GvspPacket &gvsp);
+
 };
 
 #endif // GVSPRECEIVER_H

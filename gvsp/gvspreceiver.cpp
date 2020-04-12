@@ -19,10 +19,10 @@
  ***************************************************************************/
 
 #include "gvspreceiver.h"
-#include "gvspreceiver_p.h"
+//#include "gvspreceiver_p.h"
 #include "gvsppacket.h"
 #include "gvspblock.h"
-#include "../gvcp/gvcpclient.h"
+//#include "../gvcp/gvcpclient.h"
 #include "../gvcp/gvcp.h"
 
 #include <sys/socket.h>
@@ -71,15 +71,15 @@ struct BlockDesc {
 };
 
 
-GvspReceiverPrivate::GvspReceiverPrivate(GvspClient* client)
-    : client(client),
-      run(true),
-      receiverPort(0),
-      block(NULL)
-{}
+//GvspReceiver::GvspReceiverPrivate(GvspClient* client)
+//    : client(client),
+//      run(true),
+//      receiverPort(0),
+//      block(NULL)
+//{}
 
 
-int GvspReceiverPrivate::setupSocket(const tpacket_req3 &req)
+int GvspReceiver::setupSocket(const tpacket_req3 &req)
 {
     int sd;
     // création du socket packet
@@ -106,7 +106,7 @@ int GvspReceiverPrivate::setupSocket(const tpacket_req3 &req)
     return sd;
 }
 
-void GvspReceiverPrivate::setUdpPortFilter(int sd, quint16 port)
+void GvspReceiver::setUdpPortFilter(int sd, quint16 port)
 {
     // filtre UDP and dst PORT
     sock_filter bpf_filter[] = {
@@ -137,7 +137,7 @@ void GvspReceiverPrivate::setUdpPortFilter(int sd, quint16 port)
     }
 }
 
-bool GvspReceiverPrivate::bindPacketSocket(int sd, int nicIndex)
+bool GvspReceiver::bindPacketSocket(int sd, int nicIndex)
 {
     // bind
     sockaddr_ll localAddress = {0};
@@ -155,7 +155,7 @@ bool GvspReceiverPrivate::bindPacketSocket(int sd, int nicIndex)
     return (b == 0);
 }
 
-void GvspReceiverPrivate::setRealtime()
+void GvspReceiver::setRealtime()
 {
     QDBusInterface rtkit("org.freedesktop.RealtimeKit1",
                          "/org/freedesktop/RealtimeKit1",
@@ -206,10 +206,10 @@ void GvspReceiverPrivate::setRealtime()
     }
 }
 
-int GvspReceiverPrivate::nicIndexFromAddress(const QHostAddress &address)
+int GvspReceiver::nicIndexFromAddress(const QHostAddress &address)
 {
     QList<QNetworkInterface> nis = QNetworkInterface::allInterfaces();
-    // on cherche l'interface correspondant à l'IP 我们正在寻找与IP对应的接口
+    //正在寻找与IP对应的接口
     int index = -1;
     QList<QNetworkInterface>::const_iterator ni = nis.constBegin();
     while (ni != nis.constEnd() && (index < 0)) {
@@ -229,13 +229,13 @@ int GvspReceiverPrivate::nicIndexFromAddress(const QHostAddress &address)
 
 
 GvspReceiver::GvspReceiver(GvspClient* client, QObject *parent)
-    : QThread(parent),
-      d(new GvspReceiverPrivate(client))
+    : QThread(parent),client(client),_run(true),receiverPort(0),block(NULL)
+//      d(new GvspReceiverPrivate(client))
 {}
 
 GvspReceiver::~GvspReceiver()
 {
-    d->run = false;
+    this->_run = false;
     wait();
     qDebug("Deleting Threaded Socket");
 }
@@ -253,9 +253,9 @@ quint16 GvspReceiver::getFreePort(const QHostAddress &address)
 
 void GvspReceiver::listen(const QHostAddress &receiverAddress, quint16 receiverPort, const QHostAddress &transmitterAddress)
 {
-    d->receiver = receiverAddress;
-    d->receiverPort = receiverPort;
-    d->transmitter = transmitterAddress;
+    this->receiver = receiverAddress;
+    this->receiverPort = receiverPort;
+    this->transmitter = transmitterAddress;
     start();
 }
 
@@ -271,8 +271,8 @@ void GvspReceiver::run()
     //UDP套接字绑定
     sockaddr_in localAddress = {0};
     localAddress.sin_family = AF_INET;
-    localAddress.sin_port = htons(d->receiverPort);
-    localAddress.sin_addr.s_addr = htonl(d->receiver.toIPv4Address());
+    localAddress.sin_port = htons(this->receiverPort);
+    localAddress.sin_addr.s_addr = htonl(this->receiver.toIPv4Address());
     if ( bind(sd, (struct sockaddr *)&localAddress, sizeof(struct sockaddr_in) ) == -1 ) {
         qWarning("%s",qPrintable(trUtf8("Echec bind socket GVSP")));
         return;
@@ -284,12 +284,12 @@ void GvspReceiver::run()
     getsockname(sd, (struct sockaddr *)&bindAddress, &bindAddressSize);
 
     //获得实时调度
-    d->setRealtime();
-    d->userStack(sd);
+    this->setRealtime();
+    this->userStack(sd);
     close(sd);
 }
 
-void GvspReceiverPrivate::userStack(int socketDescriptor)
+void GvspReceiver::userStack(int socketDescriptor)
 {
     qDebug("Using user mode stack");
 
@@ -320,10 +320,9 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     timeout.tv_sec = 0;
     timeout.tv_nsec = 500000000ll;
 
-    while (run) {
+    while (_run) {
         // 等待事件阅读
         if ( (pollResult = poll(&pfd, 1, 200)) > 0 ) {
-            mutex.lock();
             const int retval = recvmmsg(socketDescriptor, msgs, VLEN, 0, &timeout);//retval对应的是接收的信息数，即报文数
             if (retval > 0) {
                 for (int i=0; i < retval; ++i) {
@@ -331,7 +330,6 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
                     qWarning("status:%d blockID:%d packetID:%d packetFormat:%d payloadType:%d timestamp:%d pixelformat:%d width:%d height:%d",gvsp.status(),gvsp.blockID(),gvsp.packetID(),gvsp.packetFormat(),gvsp.payloadType(),gvsp.timestamp(),gvsp.pixelFormat(),gvsp.width(),gvsp.height());
                     doGvspPacket(gvsp);
                 }
-            mutex.unlock();
             }
             else if (retval == -1) {
                 int errn = errno;
@@ -347,7 +345,7 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
                 }
                 else {
                     qWarning("poll() error %d %s", errn, strerror(errn));
-                    run = false;
+                    _run = false;
                 }
 
             }
@@ -355,7 +353,7 @@ void GvspReceiverPrivate::userStack(int socketDescriptor)
     }
 }
 
-void GvspReceiverPrivate::doGvspPacket(const GvspPacket &gvsp)
+void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
 {
     const int status = gvsp.status();
     const uint blockID = gvsp.blockID();
@@ -380,11 +378,11 @@ void GvspReceiverPrivate::doGvspPacket(const GvspPacket &gvsp)
             //d->block = new GvspBlock(blockID, d->payloadSize, gvsp.width(), gvsp.height(), gvsp.pixelFormat(), d->segmentSize);
             block = new GvspBlock(blockID, gvsp.width(), gvsp.height(), gvsp.pixelFormat(),gvsp.type());
             block->timestamp = static_cast<qint64>(start.tv_sec) * Q_INT64_C(1000000000) + start.tv_nsec;
-            client->allocate(*block);
+            block->allocate();
 
         }
         else if (packetFormat == PACKET_FORMAT::DATA_TRAILER) {
-            client->push(*block);
+            block->push();
         }
         else {
             qWarning("packet format not handled");

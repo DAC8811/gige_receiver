@@ -90,7 +90,6 @@ HEADERS += \
     gvsp/gvspblock.h \
     gvsp/gvsppacket.h \
     gvsp/gvspreceiver.h \
-    gvsp/gvspreceiver_p.h \
     mainwindow.h
 
 FORMS += \
