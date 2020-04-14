@@ -35,6 +35,7 @@ public:
     bool connectAsController(const QHostAddress &controler, const QHostAddress &device);
     bool connectAsMonitor(const QHostAddress &monitor, const QHostAddress &device);
     void addReceiver(int channel, const QHostAddress &address, quint16 port);
+    void stopReceiver(int channel);
 
     void read(quint8 *pBuffer, qint64 address, qint64 length);
     void write(quint8 *pBuffer, qint64 address, qint64 length);

@@ -10,11 +10,15 @@
 #include "DiscoveryPage.h"
 #include "ForceIPPage.h"
 #include "GvspPage.h"
+#include "CameraSession.h"
 #include <QWizard>
+#include <set>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
+
+class CameraSession;
 
 class MainWindow : public QMainWindow
 {
@@ -27,8 +31,23 @@ public:
 private slots:
     void on_start_clicked();
 
+    void on_toolButton_clicked();
+
+    void on_stop_clicked();
+
+    void on_create_clicked();
+
 private:
     Ui::MainWindow *ui;
+    std::set<QString> path_store;
+    QWizard wizard;
+    GvcpDiscoverer* discoverer;
+    QNetworkAddressEntry* controller;
+    DISCOVERY_ACK* transmitter;
+    DISCOVERY_ACK* receiver;
+    CameraSession* session;
+
+    bool linked = false;
 };
 
 

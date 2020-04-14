@@ -58,6 +58,13 @@ void GevIPort::addReceiver(int channel, const QHostAddress &address, quint16 por
 
 }
 
+void GevIPort::stopReceiver(int channel)
+{
+    Q_D(GevIPort);
+    d->port.writeRegisters(
+                 AdressValueList() << AddressValue(Register::StreamChannelPort + channel * Register::StreamChannelBlockSize, 0));
+}
+
 void GevIPort::read(quint8 *pBuffer, qint64 address, qint64 length)
 {
     Q_D(GevIPort);

@@ -69,6 +69,8 @@ public:
 
     GvspBlock *block;
 
+    QString Save_path;
+    QString File_type;
 
 
     static int setupSocket(const tpacket_req3 &req);

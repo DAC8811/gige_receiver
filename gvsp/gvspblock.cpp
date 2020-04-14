@@ -23,6 +23,7 @@
 #include <sys/uio.h>
 #include <cstring>
 #include <opencv2/opencv.hpp>
+#include <QString>
 
 GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type)
     : //GvspImage(width, height, pixelFormat, (width * height * GVSP_PIX_PIXEL_SIZE(pixelFormat)) / 8),
@@ -71,10 +72,13 @@ void GvspBlock::allocate()
 {
     this->datas.p = new quint8[this->datas.size];
 }
-void GvspBlock::push()
+void GvspBlock::push( const QString save_path, const QString file_type)
 {
     cv::Mat file(this->height, this->width, this->type, this->datas.p);
-    cv::imwrite("/home/ash-1/qt_pj/data_save/test3.jpg",file);
+//    cv::imwrite("/home/ash-1/qt_pj/data_save/test3.jpg",file);
+    QString file_path = save_path+"/"+QString::number(num)+"."+file_type;
+//    std::cout<<file_path.toStdString().data()<<std::endl;
+    cv::imwrite(file_path.toStdString(),file);
     qWarning("ok");
 }
 void GvspBlock::trash()

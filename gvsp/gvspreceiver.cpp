@@ -327,7 +327,8 @@ void GvspReceiver::userStack(int socketDescriptor)
             if (retval > 0) {
                 for (int i=0; i < retval; ++i) {
                     GvspPacket gvsp(reinterpret_cast<const quint8 *>(iovecs[i].iov_base), msgs[i].msg_len);
-                    qWarning("status:%d blockID:%d packetID:%d packetFormat:%d payloadType:%d timestamp:%d pixelformat:%d width:%d height:%d",gvsp.status(),gvsp.blockID(),gvsp.packetID(),gvsp.packetFormat(),gvsp.payloadType(),gvsp.timestamp(),gvsp.pixelFormat(),gvsp.width(),gvsp.height());
+                    //精确输出每个包的各种解析消息
+                    //qWarning("status:%d blockID:%d packetID:%d packetFormat:%d payloadType:%d timestamp:%d pixelformat:%d width:%d height:%d",gvsp.status(),gvsp.blockID(),gvsp.packetID(),gvsp.packetFormat(),gvsp.payloadType(),gvsp.timestamp(),gvsp.pixelFormat(),gvsp.width(),gvsp.height());
                     doGvspPacket(gvsp);
                 }
             }
@@ -382,7 +383,7 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
 
         }
         else if (packetFormat == PACKET_FORMAT::DATA_TRAILER) {
-            block->push();
+            block->push(this->Save_path,this->File_type);
         }
         else {
             qWarning("packet format not handled");

@@ -41,7 +41,7 @@ public:
     uint width;
 
     void allocate();
-    void push();
+    void push( const QString save_path, const QString file_type);
     void trash();
 private:
     size_t segmentSize;        // 包长度

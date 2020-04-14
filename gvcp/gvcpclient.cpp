@@ -119,7 +119,7 @@ bool GvcpClient::connectTo(const QHostAddress &client, const QHostAddress &serve
         d->id = 1;
         connect(&d->heartbeat, SIGNAL(timeout()), this, SLOT(heartbeat()));
 
-        // obtient CCP
+        // 读CCP
         ValuesList regs = readRegisters(AddressList() << Register::ControlChannelPrivilege);
         if (regs.isEmpty()) {
             qWarning("gvcp connection failed: can't read CCP");
@@ -128,23 +128,23 @@ bool GvcpClient::connectTo(const QHostAddress &client, const QHostAddress &serve
         }
 
         CCP::Privilege current = privFromCCP(regs.at(0));
-        // on demande un acces en lecture
+        // 要求读取权限
         if ((privilege == CCP::OpenAcces)&&(current == CCP::ExclusiveAcces)) {
             qWarning("gvcp connection failed: acces denied");
             return false;
         }
-        // on demande un acces en écriture
+        // 要求写访问
         if ((privilege >= CCP::ControlAcces)&&(current >= CCP::ControlAcces)) {
             qWarning("gvcp connection failed: acces denied");
             return false;
         }
-        // acces control
+        // 获得控制
         if (privilege >= CCP::ControlAcces) {
             if (!writeRegisters(AdressValueList() << AddressValue(Register::ControlChannelPrivilege, CCPfromPrivilege(privilege)))) {
                 qWarning("gvcp connection failed: CCP acces denied");
                 return false;
             }
-            // oki on configure le heartbeat
+            // 配置心跳包
             regs = readRegisters(AddressList() << Register::HeartbeatTimeout);
             if (!regs.isEmpty()) {
                 d->heartbeat.start((regs.at(0)/100) *80);
