@@ -24,6 +24,8 @@
 #include "gvspblock.h"
 //#include "../gvcp/gvcpclient.h"
 #include "../gvcp/gvcp.h"
+#include "../mainwindow.h"
+#include "ui_mainwindow.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -62,7 +64,7 @@
 #ifndef RLIMIT_RTTIME
 #define RLIMIT_RTTIME 15
 #endif
-
+namespace Ui { class MainWindow; }
 
 struct BlockDesc {
     uint32_t version;
@@ -228,8 +230,8 @@ int GvspReceiver::nicIndexFromAddress(const QHostAddress &address)
 }
 
 
-GvspReceiver::GvspReceiver(GvspClient* client, QObject *parent)
-    : QThread(parent),client(client),_run(true),receiverPort(0),block(NULL)
+GvspReceiver::GvspReceiver(GvspClient* client, QObject *parent,Ui::MainWindow *ui)
+    : QThread(parent),client(client),_run(true),receiverPort(0),block(NULL),ui(ui)
 //      d(new GvspReceiverPrivate(client))
 {}
 
@@ -256,6 +258,7 @@ void GvspReceiver::listen(const QHostAddress &receiverAddress, quint16 receiverP
     this->receiver = receiverAddress;
     this->receiverPort = receiverPort;
     this->transmitter = transmitterAddress;
+    qWarning("begin listen");
     start();
 }
 
@@ -358,13 +361,14 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
 {
     const int status = gvsp.status();
     const uint blockID = gvsp.blockID();
+    packet_num = blockID;
     const int packetFormat = gvsp.packetFormat();
     const uint packetID = gvsp.packetID();
 
     if  (Q_LIKELY(status == STATUS::SUCCESS)) {
         if (packetFormat == PACKET_FORMAT::DATA_PAYLOAD) {
             if (block->num == blockID) {
-                qWarning("packetID%d",packetID);
+                //qWarning("packetID%d",packetID);
                 block->insert(packetID, gvsp.imagePayload);
             }
         }
@@ -383,7 +387,13 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
 
         }
         else if (packetFormat == PACKET_FORMAT::DATA_TRAILER) {
+            qWarning("blockID:%d",blockID);
             block->push(this->Save_path,this->File_type);
+            if(this->ui)
+            {
+                QString for_tip = "正在传输,已传输"+QString::number(blockID)+"张图片";
+                this->ui->tips->setText(for_tip);
+            }
         }
         else {
             qWarning("packet format not handled");

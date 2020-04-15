@@ -80,3 +80,16 @@ void GevIPort::write(quint8 *pBuffer, qint64 address, qint64 length)
     Q_D(GevIPort);
     d->port.writeMemory(address, pBuffer, length);
 }
+
+void GevIPort::SetPacketSize(int channel,uint Size)
+{
+    Q_D(GevIPort);
+    d->port.writeRegisters(
+                 AdressValueList() << AddressValue(Register::StreamChannelPacketSize + channel * Register::StreamChannelBlockSize, Size));
+}
+void GevIPort::SetPacketDelay(int channel,uint Delay)
+{
+    Q_D(GevIPort);
+    d->port.writeRegisters(
+                 AdressValueList() << AddressValue(Register::StreamChannelPacketDelay + channel * Register::StreamChannelBlockSize, Delay));
+}

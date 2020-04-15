@@ -79,7 +79,6 @@ void GvspBlock::push( const QString save_path, const QString file_type)
     QString file_path = save_path+"/"+QString::number(num)+"."+file_type;
 //    std::cout<<file_path.toStdString().data()<<std::endl;
     cv::imwrite(file_path.toStdString(),file);
-    qWarning("ok");
 }
 void GvspBlock::trash()
 {

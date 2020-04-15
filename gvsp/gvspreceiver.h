@@ -25,6 +25,8 @@
 #include <QScopedPointer>
 #include <QHostAddress>
 #include <QSharedPointer>
+#include "../mainwindow.h"
+#include "ui_mainwindow.h"
 
 template <class T>
 class QSharedPointer;
@@ -37,6 +39,7 @@ class GvspBlock;
 struct BlockDesc;
 struct tpacket_req3;
 
+namespace Ui { class MainWindow; }
 //class GvspReceiverPrivate;
 class GvspReceiver : public QThread
 {
@@ -44,7 +47,7 @@ class GvspReceiver : public QThread
 
 public:
     //explicit GvspReceiver(QSharedPointer<GvspClient> client, QObject *parent = 0);
-    explicit GvspReceiver(GvspClient* client, QObject *parent = 0);
+    explicit GvspReceiver(GvspClient* client, QObject *parent = 0, Ui::MainWindow *ui=nullptr);
     ~GvspReceiver();
 
     quint16 getFreePort(const QHostAddress &address);
@@ -59,6 +62,8 @@ private:
 private:
     Q_DISABLE_COPY(GvspReceiver)
 
+    Ui::MainWindow *ui;
+
 public:
     GvspClient* client;  //数据包接收端
     volatile bool _run;                  //控制回路输出
@@ -71,6 +76,9 @@ public:
 
     QString Save_path;
     QString File_type;
+
+    uint packet_num = 0;
+
 
 
     static int setupSocket(const tpacket_req3 &req);
