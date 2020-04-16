@@ -35,7 +35,6 @@ public:
     uint PacketSize = 2000;
     uint PacketDelay = 300;
 
-
 };
 
 

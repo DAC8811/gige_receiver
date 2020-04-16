@@ -37,17 +37,20 @@ private slots:
 
     void on_create_clicked();
 
+    void on_image_get_clicked();
+
 private:
     Ui::MainWindow *ui;
     std::set<QString> path_store;
-    QWizard wizard;
-    GvcpDiscoverer* discoverer;
-    QNetworkAddressEntry* controller;
-    DISCOVERY_ACK* transmitter;
-    DISCOVERY_ACK* receiver;
-    CameraSession* session;
+    QWizard* wizard=nullptr;
+    GvcpDiscoverer* discoverer=nullptr;
+    QNetworkAddressEntry* controller=nullptr;
+    DISCOVERY_ACK* transmitter=nullptr;
+    DISCOVERY_ACK* receiver=nullptr;
+    CameraSession* session=nullptr;
 
     bool linked = false;
+    bool recreate = false;
 };
 
 

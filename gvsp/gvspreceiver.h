@@ -67,6 +67,7 @@ private:
 public:
     GvspClient* client;  //数据包接收端
     volatile bool _run;                  //控制回路输出
+    volatile bool stop = false;
 
     QHostAddress receiver;
     QHostAddress transmitter;

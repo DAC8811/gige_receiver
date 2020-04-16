@@ -4,6 +4,7 @@
 #include "CameraSession.h"
 #include <QString>
 #include <QFileDialog>
+#include <QImage>
 
 
 
@@ -42,6 +43,11 @@ void MainWindow::on_start_clicked()
     if(linked&&!session)
     {
         session = new CameraSession(this->ui);
+        session->initSession(controller->ip(), QHostAddress(DiscoveryAckHelper::currentIP(*(transmitter))),ui->path_box->currentText(),ui->form_box->currentText());
+    }
+    else if(linked&&recreate)
+    {
+        recreate = false;
         session->initSession(controller->ip(), QHostAddress(DiscoveryAckHelper::currentIP(*(transmitter))),ui->path_box->currentText(),ui->form_box->currentText());
     }
     else if(linked)
@@ -86,40 +92,93 @@ void MainWindow::on_stop_clicked()
 
 void MainWindow::on_create_clicked()
 {
-    discoverer = new GvcpDiscoverer;
-    controller = new QNetworkAddressEntry;
-    transmitter = new DISCOVERY_ACK;
-//    receiver = new DISCOVERY_ACK;
-    wizard.setWindowTitle(trUtf8("配置GiGE Vision摄像机"));
-    wizard.addPage(new NetworkPage(controller));
-    wizard.addPage(new DiscoveryPage(discoverer,controller,transmitter));
-    wizard.addPage(new ForceIPPage(discoverer,controller,transmitter));
-//    wizard.addPage(new GvspPage(discoverer,controller,transmitter,receiver));
-    if( wizard.exec() == QDialog::Accepted)
+    if(!linked)
     {
-         linked = true;
-         if(ui->path_box->count())
-         {
-             ui->start->setEnabled(true);
-             ui->stop->setEnabled(true);
-             ui->tips->setText("点击开始按键开始传输");
-         }
-         else
-             ui->tips->setText("请设置存储路径和保存格式");
-         quint16 macH = DiscoveryAckHelper::deviceMACaddressHigh(*transmitter);
-         quint32 macL = DiscoveryAckHelper::deviceMACaddressLow(*transmitter);
-         ui->name->setText(DiscoveryAckHelper::userDefinedName(*transmitter));
-         ui->IP->setText(QHostAddress(DiscoveryAckHelper::currentIP(*transmitter)).toString());
-         ui->gate->setText(QHostAddress(DiscoveryAckHelper::defaultGateway(*transmitter)).toString());
-         ui->mask->setText(QHostAddress(DiscoveryAckHelper::currentSubnetMask(*transmitter)).toString());
-         ui->type->setText(DiscoveryAckHelper::modelName(*transmitter));
-         ui->mac->setText(QString("%0:%1:%2:%3:%4:%5")
-                          .arg((macH >> 8) & 0xFF,2,16, QLatin1Char('0'))
-                          .arg((macH >> 0) & 0xFF,2,16, QLatin1Char('0'))
-                          .arg((macL >> 24) & 0xFF,2,16, QLatin1Char('0'))
-                          .arg((macL >> 16) & 0xFF,2,16, QLatin1Char('0'))
-                          .arg((macL >> 8) & 0xFF,2,16, QLatin1Char('0'))
-                          .arg((macL >> 0) & 0xFF,2,16, QLatin1Char('0')).toUpper());
-
+        discoverer = new GvcpDiscoverer;
+        controller = new QNetworkAddressEntry;
+        transmitter = new DISCOVERY_ACK;
     }
+//    receiver = new DISCOVERY_ACK;
+    wizard = new QWizard;
+    wizard->setWindowTitle(trUtf8("配置GiGE Vision摄像机"));
+    wizard->addPage(new NetworkPage(controller));
+    wizard->addPage(new DiscoveryPage(discoverer,controller,transmitter));
+    wizard->addPage(new ForceIPPage(discoverer,controller,transmitter));
+//    wizard.addPage(new GvspPage(discoverer,controller,transmitter,receiver));
+    if( wizard->exec() == QDialog::Accepted)
+    {
+        if(!linked)
+        {
+            linked = true;
+            if(ui->path_box->count())
+            {
+                ui->start->setEnabled(true);
+                ui->stop->setEnabled(true);
+                ui->tips->setText("点击开始按键开始传输");
+            }
+            else
+                ui->tips->setText("请设置存储路径和保存格式");
+            quint16 macH = DiscoveryAckHelper::deviceMACaddressHigh(*transmitter);
+            quint32 macL = DiscoveryAckHelper::deviceMACaddressLow(*transmitter);
+            ui->name->setText(DiscoveryAckHelper::userDefinedName(*transmitter));
+            ui->IP->setText(QHostAddress(DiscoveryAckHelper::currentIP(*transmitter)).toString());
+            ui->gate->setText(QHostAddress(DiscoveryAckHelper::defaultGateway(*transmitter)).toString());
+            ui->mask->setText(QHostAddress(DiscoveryAckHelper::currentSubnetMask(*transmitter)).toString());
+            ui->type->setText(DiscoveryAckHelper::modelName(*transmitter));
+            ui->mac->setText(QString("%0:%1:%2:%3:%4:%5")
+                             .arg((macH >> 8) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macH >> 0) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 24) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 16) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 8) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 0) & 0xFF,2,16, QLatin1Char('0')).toUpper());
+        }
+        else
+        {
+            session->Session_stop();
+            quint16 macH = DiscoveryAckHelper::deviceMACaddressHigh(*transmitter);
+            quint32 macL = DiscoveryAckHelper::deviceMACaddressLow(*transmitter);
+            ui->name->setText(DiscoveryAckHelper::userDefinedName(*transmitter));
+            ui->IP->setText(QHostAddress(DiscoveryAckHelper::currentIP(*transmitter)).toString());
+            ui->gate->setText(QHostAddress(DiscoveryAckHelper::defaultGateway(*transmitter)).toString());
+            ui->mask->setText(QHostAddress(DiscoveryAckHelper::currentSubnetMask(*transmitter)).toString());
+            ui->type->setText(DiscoveryAckHelper::modelName(*transmitter));
+            ui->mac->setText(QString("%0:%1:%2:%3:%4:%5")
+                             .arg((macH >> 8) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macH >> 0) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 24) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 16) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 8) & 0xFF,2,16, QLatin1Char('0'))
+                             .arg((macL >> 0) & 0xFF,2,16, QLatin1Char('0')).toUpper());
+//            delete session;
+            recreate = true;
+            ui->start->setEnabled(true);
+            ui->stop->setEnabled(true);
+            ui->tips->setText("点击开始按键开始传输");
+        }
+    }
+}
+
+void MainWindow::on_image_get_clicked()
+{
+    if(linked&&session)
+    {
+        uint get = session->get_packet_num()-1;
+        QImage* img=new QImage;
+        QString file_path = ui->path_box->currentText()+"/"+QString::number(get)+"."+ui->form_box->currentText();
+        if(img->load(file_path))
+        {
+            int width = img->width();
+            int height = img->height();
+            int k = width/400>=height/300?width/400:height/300;
+            int Kwidth=width/k;
+            int Kheight=height/k;
+            QImage img_scaled = img->scaled(Kwidth,Kheight,Qt::KeepAspectRatio);
+//            50, 130, 401, 331
+//            ui->label_text->setText(QString("width: ")+StrWidth.setNum(Fwidth)
+//                                                +QString("\nheight: ")+StrHeigth.setNum(Fheight));
+            ui->image_show->setPixmap(QPixmap::fromImage(img_scaled));
+        }
+    }
+
 }

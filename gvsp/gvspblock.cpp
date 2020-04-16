@@ -23,6 +23,7 @@
 #include <sys/uio.h>
 #include <cstring>
 #include <opencv2/opencv.hpp>
+#include <iostream>
 #include <QString>
 
 GvspBlock::GvspBlock(uint num, uint width, uint height, quint32 pixelFormat,quint32 type)
@@ -79,6 +80,7 @@ void GvspBlock::push( const QString save_path, const QString file_type)
     QString file_path = save_path+"/"+QString::number(num)+"."+file_type;
 //    std::cout<<file_path.toStdString().data()<<std::endl;
     cv::imwrite(file_path.toStdString(),file);
+//    cv::imshow( std::to_string(num) ,file);
 }
 void GvspBlock::trash()
 {

@@ -394,6 +394,11 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
                 QString for_tip = "正在传输,已传输"+QString::number(blockID)+"张图片";
                 this->ui->tips->setText(for_tip);
             }
+            if(stop)
+            {
+                stop = false;
+                _run = false;
+            }
         }
         else {
             qWarning("packet format not handled");

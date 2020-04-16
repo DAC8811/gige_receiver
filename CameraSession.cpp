@@ -47,7 +47,7 @@ void CameraSession::initSession(const QHostAddress &controller, const QHostAddre
 void CameraSession::Session_stop()
 {
    iport->stopReceiver(0);
-   this->gvsp->_run=false;
+   this->gvsp->stop=true;
 //   delete iport;
 //   iport = NULL;
 }
@@ -80,3 +80,7 @@ uint CameraSession::get_packet_num()
     else
         return 0;
 }
+
+
+
+
