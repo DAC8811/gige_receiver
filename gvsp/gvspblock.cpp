@@ -76,11 +76,9 @@ void GvspBlock::allocate()
 void GvspBlock::push( const QString save_path, const QString file_type)
 {
     cv::Mat file(this->height, this->width, this->type, this->datas.p);
-//    cv::imwrite("/home/ash-1/qt_pj/data_save/test3.jpg",file);
     QString file_path = save_path+"/"+QString::number(num)+"."+file_type;
-//    std::cout<<file_path.toStdString().data()<<std::endl;
     cv::imwrite(file_path.toStdString(),file);
-//    cv::imshow( std::to_string(num) ,file);
+
 }
 void GvspBlock::trash()
 {

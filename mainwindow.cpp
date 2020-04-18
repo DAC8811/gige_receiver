@@ -5,6 +5,8 @@
 #include <QString>
 #include <QFileDialog>
 #include <QImage>
+#include <unistd.h>
+
 
 
 
@@ -29,6 +31,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->mask->setAlignment(Qt::AlignHCenter);
     ui->gate->setAlignment(Qt::AlignHCenter);
     ui->mac->setAlignment(Qt::AlignHCenter);
+    ui->packetsize->setValidator(new QIntValidator(500, 5000, this));
+    ui->packetdelay->setValidator(new QIntValidator(1, 1000, this));
 }
 
 MainWindow::~MainWindow()
@@ -88,6 +92,8 @@ void MainWindow::on_stop_clicked()
     ui->start->setEnabled(true);
     QString for_tip = "传输暂停,已传输"+QString::number(session->get_packet_num())+"张图片";
     ui->tips->setText(for_tip);
+    usleep(1000*200);
+    ui->speed_show->setText(QString::number(0));
 }
 
 void MainWindow::on_create_clicked()

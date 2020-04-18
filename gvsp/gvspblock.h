@@ -22,6 +22,7 @@
 #define GVSPBLOCK_H
 
 #include "gvsp.h"
+#include "GvspFileSave.h"
 
 class ConstMemoryBlock;
 
@@ -39,6 +40,8 @@ public:
     int type;
     uint height;
     uint width;
+
+//    GvspFileSave* FileSave;
 
     void allocate();
     void push( const QString save_path, const QString file_type);

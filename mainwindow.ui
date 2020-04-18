@@ -80,7 +80,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>50</y>
+      <y>60</y>
       <width>101</width>
       <height>17</height>
      </rect>
@@ -93,7 +93,7 @@
     <property name="geometry">
      <rect>
       <x>110</x>
-      <y>50</y>
+      <y>60</y>
       <width>111</width>
       <height>25</height>
      </rect>
@@ -442,14 +442,56 @@ font: 75 11pt &quot;URW Bookman L&quot;;</string>
    <widget class="QPushButton" name="image_get">
     <property name="geometry">
      <rect>
-      <x>680</x>
-      <y>440</y>
+      <x>350</x>
+      <y>60</y>
       <width>101</width>
       <height>25</height>
      </rect>
     </property>
     <property name="text">
      <string>获取传输图像</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_14">
+    <property name="geometry">
+     <rect>
+      <x>530</x>
+      <y>420</y>
+      <width>67</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>传输速度：</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speed_show">
+    <property name="geometry">
+     <rect>
+      <x>610</x>
+      <y>420</y>
+      <width>111</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color: rgb(255, 255, 255);</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_16">
+    <property name="geometry">
+     <rect>
+      <x>730</x>
+      <y>420</y>
+      <width>51</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>MB/s</string>
     </property>
    </widget>
   </widget>

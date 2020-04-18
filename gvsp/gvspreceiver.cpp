@@ -52,6 +52,7 @@
 #include <QUdpSocket>
 #include <QDebug>
 #include <QMutex>
+#include <QTime>
 
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -264,6 +265,7 @@ void GvspReceiver::listen(const QHostAddress &receiverAddress, quint16 receiverP
 
 void GvspReceiver::run()
 {
+    this->FileSave = new GvspFileSave(this->ui);
     //UDP套接字描述符
     int sd;
     if ( (sd = socket(PF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0 ) {
@@ -369,6 +371,7 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
         if (packetFormat == PACKET_FORMAT::DATA_PAYLOAD) {
             if (block->num == blockID) {
                 //qWarning("packetID%d",packetID);
+//                start_time = QTime::currentTime();
                 block->insert(packetID, gvsp.imagePayload);
             }
         }
@@ -388,7 +391,15 @@ void GvspReceiver::doGvspPacket(const GvspPacket &gvsp)
         }
         else if (packetFormat == PACKET_FORMAT::DATA_TRAILER) {
             qWarning("blockID:%d",blockID);
-            block->push(this->Save_path,this->File_type);
+//            block->push(this->Save_path,this->File_type);
+            uchar* p_temp = new quint8[block->datas.size];
+            memcpy(p_temp,block->datas.p,block->datas.size);
+            FileSave->Set(blockID,block->width,block->height,block->type,block->datas.size,p_temp,Save_path,File_type);
+            FileSave->start();
+//            end_time = QTime::currentTime();
+//            int msec = end_time.msec()-start_time.msec();
+//            double speed = block->datas.size/(msec);
+//            ui->speed_show->setText(QString::number(speed, 10, 3));
             if(this->ui)
             {
                 QString for_tip = "正在传输,已传输"+QString::number(blockID)+"张图片";

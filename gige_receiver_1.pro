@@ -46,6 +46,7 @@ SOURCES += \
     gvcp/writememhelper.cpp \
     gvcp/writereghelper.cpp \
     gvsp/GvspClient.cpp \
+    gvsp/GvspFileSave.cpp \
     gvsp/gvsp.cpp \
     gvsp/gvspblock.cpp \
     gvsp/gvsppacket.cpp \
@@ -85,6 +86,7 @@ HEADERS += \
     gvcp/writememhelper.h \
     gvcp/writereghelper.h \
     gvsp/GvspClient.h \
+    gvsp/GvspFileSave.h \
     gvsp/constmemoryblock.h \
     gvsp/gvsp.h \
     gvsp/gvspblock.h \

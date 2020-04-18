@@ -27,6 +27,8 @@
 #include <QSharedPointer>
 #include "../mainwindow.h"
 #include "ui_mainwindow.h"
+#include "GvspFileSave.h"
+#include <QTime>
 
 template <class T>
 class QSharedPointer;
@@ -38,6 +40,7 @@ class GvspPacket;
 class GvspBlock;
 struct BlockDesc;
 struct tpacket_req3;
+class GvspFileSave;
 
 namespace Ui { class MainWindow; }
 //class GvspReceiverPrivate;
@@ -78,7 +81,12 @@ public:
     QString Save_path;
     QString File_type;
 
+    GvspFileSave* FileSave;
+
     uint packet_num = 0;
+
+
+
 
 
 
